@@ -8,22 +8,39 @@
 import Foundation
 
 open class MarkdownItalic: MarkdownCommonElement {
-  
-  fileprivate static let regex = "(.?|^)(\\*|_)(?=\\S)(.+?)(?<![\\*_\\s])(\\2)"
+  // Modified regex to avoid matching underscores in URLs
+  fileprivate static let regex = "(?<!\\]\\([^\\)]*)(.?|^)(\\*|_)(?=\\S)(.+?)(?<![\\*_\\s])(\\2)(?![^\\(]*\\))"
 
   open var font: MarkdownFont?
   open var color: MarkdownColor?
-  
+
   open var regex: String {
     return MarkdownItalic.regex
   }
-  
+
   public init(font: MarkdownFont? = nil, color: MarkdownColor? = nil) {
     self.font = font
     self.color = color
   }
-    
+
   public func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+    // Check if we're inside a URL before proceeding
+    let fullRange = match.range
+    let fullString = attributedString.string as NSString
+    let matchText = fullString.substring(with: fullRange)
+
+    // Skip if the match appears to be inside a URL
+    if fullString.contains("[") && fullString.contains("](") && fullString.contains(")") {
+      let before = fullString.substring(with: NSRange(location: 0, length: max(0, fullRange.location)))
+      let after = fullString.substring(with: NSRange(location: fullRange.location + fullRange.length,
+                                                     length: fullString.length - (fullRange.location + fullRange.length)))
+
+      // Crude check if we're inside a URL part of a Markdown link
+      if before.contains("[") && before.contains("](") && !before.contains(")") && after.contains(")") {
+        return
+      }
+    }
+
     attributedString.deleteCharacters(in: match.range(at: 4))
 
     var attributes = self.attributes

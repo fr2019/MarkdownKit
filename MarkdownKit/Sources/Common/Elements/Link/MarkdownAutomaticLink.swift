@@ -8,15 +8,22 @@
 import Foundation
 
 open class MarkdownAutomaticLink: MarkdownLink {
-  
- open override func regularExpression() throws -> NSRegularExpression {
+  override open func regularExpression() throws -> NSRegularExpression {
     return try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
   }
-  
-  open override func match(_ match: NSTextCheckingResult,
-                             attributedString: NSMutableAttributedString) {
-    let linkURLString = attributedString.attributedSubstring(from: match.range).string
-    formatText(attributedString, range: match.range, link: linkURLString)
-    addAttributes(attributedString, range: match.range)
+
+  override open func match(_ match: NSTextCheckingResult, attributedString: NSMutableAttributedString) {
+    let originalString = attributedString.string as NSString
+    let matchRange = match.range
+
+    // Skip if the match is within an explicit markdown link (e.g., [text](url))
+    let precedingText = originalString.substring(to: matchRange.location)
+    if precedingText.contains("[") && precedingText.contains("](") {
+      return // Avoid processing explicit links
+    }
+
+    let linkURLString = originalString.substring(with: matchRange)
+    formatText(attributedString, range: matchRange, link: linkURLString)
+    addAttributes(attributedString, range: matchRange)
   }
 }

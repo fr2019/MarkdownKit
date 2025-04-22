@@ -12,6 +12,7 @@ import UIKit
 
 public extension MarkdownLink {
   static let defaultColor = UIColor.blue
+  static let defaultFontSize: CGFloat = 18.0
 }
 
 #endif
