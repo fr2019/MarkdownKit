@@ -11,7 +11,7 @@
 import UIKit
 
 public extension MarkdownHeader {
-    static let defaultFont = UIFont.boldSystemFont(ofSize: UIFont.smallSystemFontSize)
+    static let defaultFont = UIFont.boldSystemFont(ofSize: 20)
 }
 
 #endif

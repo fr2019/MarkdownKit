@@ -1,5 +1,5 @@
 //
-//  MarkdownHeader+UIKit.swift
+//  MarkdownHeader+AppKit.swift
 //  MarkdownKit
 //
 //  Created by Bruno Oliveira on 31/01/2019.
